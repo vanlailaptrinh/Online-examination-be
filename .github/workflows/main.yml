@@ -47,14 +47,15 @@ jobs:
           debug: true                 # bật log debug chi tiết
           script: |
             # Dừng container cũ
-            docker stop online-exam-be || true
-            docker rm online-exam-be || true
+            sudo docker stop online-exam-be || true            
+            
+            sudo docker rm online-exam-be || true
 
             # Xóa image cũ (tuỳ chọn)
-            docker rmi vantrandevops/online-exam-be:latest || true
+            sudo docker rmi vantrandevops/online-exam-be:latest || true
 
             # Kéo image mới
-            docker pull vantrandevops/online-exam-be:latest
+            sudo docker pull vantrandevops/online-exam-be:latest
 
             # Chạy container mới
-            docker-compose up -d
+            sudo docker compose up -d || sudo docker-compose up -d
