@@ -19,13 +19,13 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
 
-      # # 3️⃣ Build & push Docker image
-      # - name: Build & Push Docker image
-      #   uses: docker/build-push-action@v5
-      #   with:
-      #     context: .
-      #     push: true
-      #     tags: vantrandevops/online-exam-be:latest
+      # 3️⃣ Build & push Docker image
+      - name: Build & Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: vantrandevops/online-exam-be:latest
 
       # 4️⃣ Test SSH key trực tiếp (debug key)
       - name: Test EC2 SSH key
