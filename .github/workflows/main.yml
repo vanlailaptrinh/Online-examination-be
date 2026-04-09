@@ -51,6 +51,8 @@ jobs:
             
             sudo docker rm online-exam-be || true
 
+            sudo docker-compose down
+
             # Xóa image cũ (tuỳ chọn)
             sudo docker rmi vantrandevops/online-exam-be:latest || true
 
