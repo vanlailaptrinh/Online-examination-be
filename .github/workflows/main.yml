@@ -46,4 +46,4 @@ jobs:
             docker pull vantrandevops/online-exam-be:latest
 
             # Chạy container mới
-            docker run -d --name online-exam-be -p 8080:8080 vantrandevops/online-exam-be:latest
+            docker-compose up -d
