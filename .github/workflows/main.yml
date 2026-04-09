@@ -8,18 +8,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout code
+      # 1️⃣ Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Login Docker Hub
+      # 2️⃣ Login Docker Hub
       - name: Login Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
 
-      # 3. Build & push image
+      # 3️⃣ Build & push Docker image
       - name: Build & Push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -27,7 +27,16 @@ jobs:
           push: true
           tags: vantrandevops/online-exam-be:latest
 
-      # 4. SSH vào EC2 và deploy
+      # 4️⃣ Test SSH key trực tiếp (debug key)
+      - name: Test EC2 SSH key
+        run: |
+          echo "$EC2_KEY" > test-key.pem
+          chmod 600 test-key.pem
+          ssh -o StrictHostKeyChecking=no -i test-key.pem ec2-user@52.221.192.117 "echo 'SSH connection OK'"
+        env:
+          EC2_KEY: ${{ secrets.EC2_KEY }}
+
+      # 5️⃣ Deploy trên EC2 với appleboy SSH Action và debug bật
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v0.1.9
         with:
@@ -35,6 +44,7 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_KEY }}
           port: 22
+          debug: true                 # bật log debug chi tiết
           script: |
             # Dừng container cũ
             docker stop online-exam-be || true
