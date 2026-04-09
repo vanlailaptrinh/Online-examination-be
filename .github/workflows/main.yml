@@ -42,8 +42,7 @@ jobs:
         with:
           host: 52.221.192.117
           username: ec2-user
-          key: ${{ secrets.EC2_KEY }}
-          key_encoding: 'base64'   # Bắt buộc khi dùng base64
+          key_path: test-key.pem     # 👈 Dùng luôn file key đã giải mã thành công ở Bước 4          key_encoding: 'base64'   # Bắt buộc khi dùng base64
           port: 22
           debug: true                 # bật log debug chi tiết
           script: |
