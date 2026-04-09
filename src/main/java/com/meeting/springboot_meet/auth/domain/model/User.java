@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -20,4 +21,5 @@ public class User {
     private Instant createdAt = Instant.now();
     private List<RefreshToken> refreshTokens;
     private List<UserProvider> userProvider;
-}
+    private Set<UserRole> roles;
+}

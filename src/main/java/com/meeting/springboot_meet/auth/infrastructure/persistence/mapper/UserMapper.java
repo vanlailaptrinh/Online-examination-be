@@ -19,8 +19,7 @@ public class UserMapper {
                 .fullName(entity.getFullName())
                 .enabled(entity.isEnabled())
                 .createdAt(entity.getCreatedAt())
-                // Chỉ set null danh sách để tránh đệ quy, service sẽ tự query RefreshTokens nếu cần
-                // Hoặc bạn có thể dùng Lazy Loading bằng cách Custom
+                .roles(entity.getRoles())
                 .refreshTokens(new ArrayList<>())
                 .userProvider(new ArrayList<>())
                 .build();
@@ -34,7 +33,7 @@ public class UserMapper {
                 .fullName(domain.getFullName())
                 .enabled(domain.isEnabled())
                 .createdAt(domain.getCreatedAt())
-                // Không map lists để tránh đệ quy ở đây
+                .roles(domain.getRoles())
                 .build();
     }
 }

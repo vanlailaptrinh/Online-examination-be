@@ -21,7 +21,7 @@ public class TokenService {
     private final RefreshTokenService refreshTokenService;
 
     private String generateAccessToken(User user) {
-        return jwtUtil.generateAccessToken(user.getId());
+        return jwtUtil.generateAccessToken(user.getId(), user.getRoles());
     }
 
     private String generateRefreshToken() {
@@ -30,8 +30,9 @@ public class TokenService {
 
     public LoginResult generateTokens(User user, String userAgent, String ip) {
 
-        String accessToken = jwtUtil.generateAccessToken(user.getId());
+        String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getRoles());
         String refreshToken = jwtUtil.generateRefreshToken();
+
 
         refreshTokenService.createRefreshToken(user, refreshToken, userAgent, ip);
 

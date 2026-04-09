@@ -1,9 +1,10 @@
 package com.meeting.springboot_meet.auth.application.service;
 
 import com.meeting.springboot_meet.auth.domain.model.ProviderType;
-import com.meeting.springboot_meet.auth.domain.model.UserProvider;
-import com.meeting.springboot_meet.auth.domain.repository.UserProviderRepository;
 import com.meeting.springboot_meet.auth.domain.model.User;
+import com.meeting.springboot_meet.auth.domain.model.UserProvider;
+import com.meeting.springboot_meet.auth.domain.model.UserRole;
+import com.meeting.springboot_meet.auth.domain.repository.UserProviderRepository;
 import com.meeting.springboot_meet.auth.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,9 +46,11 @@ public class OAuth2Service {
         User user = User.builder()
                 .email(email)
                 .fullName(name)
+                .roles(java.util.Set.of(UserRole.ROLE_STUDENT))
                 .build();
 
-        userRepository.save(user);
+        user = userRepository.save(user);
+
         userProviderRepository.save(
                 UserProvider.builder()
                         .user(user)
