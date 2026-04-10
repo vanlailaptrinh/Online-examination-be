@@ -43,8 +43,11 @@ public class AuthService {
 
         String token = UUID.randomUUID().toString();
 
-        // PUBLIC REGISTER: Always ROLE_STUDENT
-        Set<UserRole> roles = Collections.singleton(UserRole.ROLE_STUDENT);
+        // PUBLIC REGISTER: Người dùng chọn STUDENT hoặc TEACHER, mặc định STUDENT
+        UserRole selectedRole = (request.getRole() != null && !request.getRole().isBlank())
+                ? UserRole.valueOf("ROLE_" + request.getRole())
+                : UserRole.ROLE_STUDENT;
+        Set<UserRole> roles = Collections.singleton(selectedRole);
 
         redisVerificationService.saveVerification(token,
                 request.getEmail(),
