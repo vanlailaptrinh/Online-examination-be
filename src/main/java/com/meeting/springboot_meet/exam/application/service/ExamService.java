@@ -18,6 +18,7 @@ public class ExamService {
 
     private final ExamRepository examRepository;
     private final ClassroomMemberRepository classroomMemberRepository;
+    private final com.meeting.springboot_meet.evaluation.domain.repository.AttemptRepository attemptRepository;
 
     @Transactional
     public Exam createExam(Exam exam, Long teacherId) {
@@ -35,10 +36,16 @@ public class ExamService {
     }
 
     public Optional<Exam> getExamForStudent(Long examId, Long studentId) {
+        // Find if student is assigned to this exam via a classroom
         List<Long> classroomIds = classroomMemberRepository.findByUserId(studentId).stream()
             .map(ClassroomMember::getClassroomId)
             .toList();
-        return examRepository.findExamForStudent(examId, classroomIds);
+        
+        // Determine if we should show correct answers (Review mode)
+        // Correct answers should only be shown if there is already a submitted attempt
+        boolean hasAttempt = attemptRepository.findByStudentIdAndExamId(studentId, examId).isPresent();
+        
+        return examRepository.findExamForStudent(examId, classroomIds, hasAttempt);
     }
 
     public List<Exam> getStudentExams(Long studentId) {

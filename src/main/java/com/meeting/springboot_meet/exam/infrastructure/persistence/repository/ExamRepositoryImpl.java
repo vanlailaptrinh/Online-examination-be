@@ -97,7 +97,7 @@ public class ExamRepositoryImpl implements ExamRepository {
     }
 
     @Override
-    public Optional<Exam> findExamForStudent(Long examId, List<Long> classroomIds) {
+    public Optional<Exam> findExamForStudent(Long examId, List<Long> classroomIds, boolean includeCorrectAnswers) {
         if (classroomIds == null || classroomIds.isEmpty()) return Optional.empty();
         
         List<com.meeting.springboot_meet.exam.infrastructure.persistence.entity.ClassroomExamEntity> assignments = 
@@ -108,7 +108,7 @@ public class ExamRepositoryImpl implements ExamRepository {
         if (assignments.isEmpty()) return Optional.empty();
         
         com.meeting.springboot_meet.exam.infrastructure.persistence.entity.ClassroomExamEntity assignment = assignments.get(0);
-        Exam exam = examMapper.toDomain(assignment.getExam());
+        Exam exam = examMapper.toDomain(assignment.getExam(), includeCorrectAnswers);
         exam.setDurationInMinutes(assignment.getDurationInMinutes());
         return Optional.of(exam);
     }

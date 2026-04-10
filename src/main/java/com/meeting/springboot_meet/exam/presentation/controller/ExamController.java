@@ -25,7 +25,7 @@ public class ExamController {
     private final ExamService examService;
 
     @PostMapping
-    @PreAuthorize("hasRole('TEACHER')")
+    @PreAuthorize("hasAuthority('ROLE_TEACHER')")
     public ResponseEntity<ApiResponse<Exam>> createExam(
             @Valid @RequestBody ExamCreateRequest request,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -38,12 +38,13 @@ public class ExamController {
                     Question.builder()
                         .content(qRequest.getContent())
                         .type(qRequest.getType())
-                        .options(qRequest.getOptions().stream().map(oRequest -> 
-                            Option.builder()
+                        .options(qRequest.getOptions().stream().map(oRequest -> {
+                            System.out.println("[CREATE EXAM] option=" + oRequest.getContent() + " isCorrect=" + oRequest.isCorrect());
+                            return Option.builder()
                                 .content(oRequest.getContent())
                                 .isCorrect(oRequest.isCorrect())
-                                .build()
-                        ).collect(Collectors.toList()))
+                                .build();
+                        }).collect(Collectors.toList()))
                         .build()
                 ).collect(Collectors.toList()))
                 .build();
@@ -53,7 +54,7 @@ public class ExamController {
     }
 
     @GetMapping("/teacher")
-    @PreAuthorize("hasRole('TEACHER')")
+    @PreAuthorize("hasAuthority('ROLE_TEACHER')")
     public ResponseEntity<ApiResponse<List<Exam>>> getTeacherExams(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         
@@ -62,7 +63,7 @@ public class ExamController {
     }
 
     @GetMapping("/student")
-    @PreAuthorize("hasRole('STUDENT')")
+    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     public ResponseEntity<ApiResponse<List<Exam>>> getStudentExams(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         
@@ -87,14 +88,14 @@ public class ExamController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('TEACHER')")
+    @PreAuthorize("hasAuthority('ROLE_TEACHER')")
     public ResponseEntity<ApiResponse<Void>> deleteExam(@PathVariable Long id) {
         examService.deleteExam(id);
         return ResponseEntity.ok(new ApiResponse<>("Exam deleted successfully", null));
     }
 
     @PostMapping("/{id}/assignments")
-    @PreAuthorize("hasRole('TEACHER')")
+    @PreAuthorize("hasAuthority('ROLE_TEACHER')")
     public ResponseEntity<ApiResponse<Void>> assignExam(
             @PathVariable Long id,
             @Valid @RequestBody com.meeting.springboot_meet.exam.presentation.payload.AssignmentRequest request) {
@@ -104,7 +105,7 @@ public class ExamController {
     }
 
     @PatchMapping("/{id}/visibility")
-    @PreAuthorize("hasRole('TEACHER')")
+    @PreAuthorize("hasAuthority('ROLE_TEACHER')")
     public ResponseEntity<ApiResponse<Void>> toggleVisibility(
             @PathVariable Long id,
             @RequestParam boolean showResults) {

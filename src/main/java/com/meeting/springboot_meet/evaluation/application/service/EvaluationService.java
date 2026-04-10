@@ -64,27 +64,47 @@ public class EvaluationService {
                 .map(Option::getId)
                 .collect(Collectors.toSet());
 
-        long totalCorrectOptions = correctOptionIds.size();
-        if (totalCorrectOptions == 0) return 0.0; // Avoid division by zero for bad data
+        // === DIAGNOSTIC LOGGING - REMOVE AFTER FIX ===
+        System.out.println("[GRADING] Question ID: " + question.getId());
+        System.out.println("[GRADING] Correct option IDs from DB: " + correctOptionIds + " (types: " + correctOptionIds.stream().map(id -> id.getClass().getSimpleName()).collect(Collectors.joining(",")) + ")");
+        System.out.println("[GRADING] Student selected option IDs: " + selectedOptionIds + " (types: " + selectedOptionIds.stream().map(id -> id == null ? "null" : id.getClass().getSimpleName()).collect(Collectors.joining(",")) + ")");
+        // ===============================================
 
-        long correctChosen = selectedOptionIds.stream()
+        long totalCorrectOptions = correctOptionIds.size();
+        if (totalCorrectOptions == 0) {
+            System.out.println("[GRADING] No correct answers defined for this question! Returning 0.");
+            return 0.0;
+        }
+
+        // Normalize all selectedOptionIds to Long to avoid Integer vs Long mismatch
+        Set<Long> normalizedSelectedIds = selectedOptionIds.stream()
+                .map(id -> Long.parseLong(id.toString()))
+                .collect(Collectors.toSet());
+
+        long correctChosen = normalizedSelectedIds.stream()
                 .filter(correctOptionIds::contains)
                 .count();
 
-        long wrongChosen = selectedOptionIds.size() - correctChosen;
+        long wrongChosen = normalizedSelectedIds.size() - correctChosen;
+
+        System.out.println("[GRADING] correctChosen=" + correctChosen + ", wrongChosen=" + wrongChosen + ", totalCorrect=" + totalCorrectOptions);
 
         // Rule 1: No wrong options chosen (just missed some correct ones) -> partial points
         if (wrongChosen == 0) {
-            return (double) correctChosen / totalCorrectOptions;
+            double score = (double) correctChosen / totalCorrectOptions;
+            System.out.println("[GRADING] Rule 1 applied. Score: " + score);
+            return score;
         } 
         
         // Rule 2: Selected ALL correct options, but some wrong ones -> penalize for wrong options chosen
         if (correctChosen == totalCorrectOptions) {
-            double score = (double) (correctChosen - wrongChosen) / totalCorrectOptions;
-            return Math.max(0.0, score);
+            double score = Math.max(0.0, (double) (correctChosen - wrongChosen) / totalCorrectOptions);
+            System.out.println("[GRADING] Rule 2 applied. Score: " + score);
+            return score;
         }
         
         // Rule 3: Missed correct options AND chose wrong options -> 0 points
+        System.out.println("[GRADING] Rule 3 applied. Score: 0.0");
         return 0.0;
     }
 

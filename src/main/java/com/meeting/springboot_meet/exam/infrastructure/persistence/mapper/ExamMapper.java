@@ -15,6 +15,10 @@ import java.util.stream.Collectors;
 public class ExamMapper {
 
     public Exam toDomain(ExamEntity entity) {
+        return toDomain(entity, true);
+    }
+
+    public Exam toDomain(ExamEntity entity, boolean includeCorrectAnswers) {
         if (entity == null) return null;
         return Exam.builder()
                 .id(entity.getId())
@@ -24,28 +28,28 @@ public class ExamMapper {
                 .showResultToStudent(entity.isShowResultToStudent())
                 .createdAt(entity.getCreatedAt())
                 .questions(entity.getQuestions() != null ? entity.getQuestions().stream()
-                        .map(this::toQuestionDomain)
+                        .map(q -> toQuestionDomain(q, includeCorrectAnswers))
                         .collect(Collectors.toList()) : new ArrayList<>())
                 .build();
     }
 
-    private Question toQuestionDomain(QuestionEntity entity) {
+    private Question toQuestionDomain(QuestionEntity entity, boolean includeCorrectAnswers) {
         return Question.builder()
                 .id(entity.getId())
                 .content(entity.getContent())
                 .type(entity.getType().name())
                 .examId(entity.getExam().getId())
                 .options(entity.getOptions() != null ? entity.getOptions().stream()
-                        .map(this::toOptionDomain)
+                        .map(o -> toOptionDomain(o, includeCorrectAnswers))
                         .collect(Collectors.toList()) : new ArrayList<>())
                 .build();
     }
 
-    private Option toOptionDomain(OptionEntity entity) {
+    private Option toOptionDomain(OptionEntity entity, boolean includeCorrectAnswers) {
         return Option.builder()
                 .id(entity.getId())
                 .content(entity.getContent())
-                .isCorrect(entity.isCorrect())
+                .isCorrect(includeCorrectAnswers && entity.isCorrect())
                 .questionId(entity.getQuestion().getId())
                 .build();
     }

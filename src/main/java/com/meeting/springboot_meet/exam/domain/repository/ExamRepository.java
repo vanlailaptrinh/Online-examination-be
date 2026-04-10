@@ -11,5 +11,5 @@ public interface ExamRepository {
     void deleteById(Long id);
     void assignToClassrooms(Long examId, List<Long> classroomIds, java.time.Instant start, java.time.Instant end, Integer duration);
     List<Exam> findAssignedExamsByClassroomIds(List<Long> classroomIds);
-    Optional<Exam> findExamForStudent(Long examId, List<Long> classroomIds);
+    Optional<Exam> findExamForStudent(Long examId, List<Long> classroomIds, boolean includeCorrectAnswers);
 }
