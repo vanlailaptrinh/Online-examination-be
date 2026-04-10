@@ -12,55 +12,55 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # # 2️⃣ Login Docker Hub
-      # - name: Login Docker Hub
-      #   uses: docker/login-action@v3
-      #   with:
-      #     username: ${{ secrets.DOCKER_USER }}
-      #     password: ${{ secrets.DOCKER_PASS }}
+      # 2️⃣ Login Docker Hub
+      - name: Login Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASS }}
 
-      # # 3️⃣ Build & push Docker image
-      # - name: Build & Push Docker image
-      #   uses: docker/build-push-action@v5
-      #   with:
-      #     context: .
-      #     push: true
-      #     tags: vantrandevops/online-exam-be:latest
+      # 3️⃣ Build & push Docker image
+      - name: Build & Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: vantrandevops/online-exam-be:latest
 
-      # # 4️⃣ Test SSH key trực tiếp (debug key)
-      # - name: Test EC2 SSH key
-      #   run: |
-      #     echo "$EC2_KEY" | base64 --decode > test-key.pem
-      #     chmod 600 test-key.pem
-      #     ssh -o StrictHostKeyChecking=no -i test-key.pem ec2-user@52.221.192.117 "echo 'SSH connection OK'"
-      #   env:
-      #     EC2_KEY: ${{ secrets.EC2_KEY }}
+      # 4️⃣ Test SSH key trực tiếp (debug key)
+      - name: Test EC2 SSH key
+        run: |
+          echo "$EC2_KEY" | base64 --decode > test-key.pem
+          chmod 600 test-key.pem
+          ssh -o StrictHostKeyChecking=no -i test-key.pem ec2-user@52.221.192.117 "echo 'SSH connection OK'"
+        env:
+          EC2_KEY: ${{ secrets.EC2_KEY }}
 
-      # # 5️⃣ Deploy trên EC2 với appleboy SSH Action và debug bật
-      # - name: Deploy on EC2
-      #   uses: appleboy/ssh-action@v0.1.9
-      #   with:
-      #     host: 52.221.192.117
-      #     username: ec2-user
-      #     key_path: test-key.pem     # 👈 Dùng luôn file key đã giải mã thành công ở Bước 4          key_encoding: 'base64'   # Bắt buộc khi dùng base64
-      #     port: 22
-      #     debug: true                 # bật log debug chi tiết
-      #     script: |
-      #       # Dừng container cũ
-      #       sudo docker stop online-exam-be || true            
+      # 5️⃣ Deploy trên EC2 với appleboy SSH Action và debug bật
+      - name: Deploy on EC2
+        uses: appleboy/ssh-action@v0.1.9
+        with:
+          host: 52.221.192.117
+          username: ec2-user
+          key_path: test-key.pem     # 👈 Dùng luôn file key đã giải mã thành công ở Bước 4          key_encoding: 'base64'   # Bắt buộc khi dùng base64
+          port: 22
+          debug: true                 # bật log debug chi tiết
+          script: |
+            # Dừng container cũ
+            sudo docker stop online-exam-be || true            
             
-      #       sudo docker rm online-exam-be || true
+            sudo docker rm online-exam-be || true
 
-      #       sudo docker-compose down
+            sudo docker-compose down
 
-      #       # Xóa image cũ (tuỳ chọn)
-      #       sudo docker rmi vantrandevops/online-exam-be:latest || true
+            # Xóa image cũ (tuỳ chọn)
+            sudo docker rmi vantrandevops/online-exam-be:latest || true
 
-      #       # Kéo image mới
-      #       sudo docker pull vantrandevops/online-exam-be:latest
+            # Kéo image mới
+            sudo docker pull vantrandevops/online-exam-be:latest
 
-      #       # Chạy container mới
-      #       sudo docker compose up -d || sudo docker-compose up -d
+            # Chạy container mới
+            sudo docker compose up -d || sudo docker-compose up -d
       # 6️⃣ Đăng nhập vào AWS
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
